@@ -26,7 +26,7 @@ class AuthController extends Controller
 
 public function signUp(UserRegisterRequest $request)
 {
-    return $this->authRepository->signIn($request);
+    return $this->authRepository->signUp($request);
 }
 
      /**
