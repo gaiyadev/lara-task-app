@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Repositories\AuthRepositoryInterface;
+use App\Interfaces\AuthRepositoryInterface;
+use App\Http\Requests\UserLoginRequest;
+use App\Http\Requests\UserRegisterRequest;
 
 class AuthController extends Controller
 {
@@ -22,66 +24,23 @@ class AuthController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
 
-public function signUp(Request $request)
+public function signUp(UserRegisterRequest $request)
 {
-     $fields = $request->validate([
-            'email' => ['required', 'email', 'unique:users,email', 'max:255'],
-            'password' => ['required', 'min:6', 'confirmed'],
-            'name' => ['required', 'alpha'],
-        ]);
-
-    try {
-        $credentials = $request->only('email', 'password', 'name');
-
-        $response = $this->authRepository->signUp(
-            $credentials['email'],
-            $credentials['password'],
-            $credentials['name']
-        );
-
-        return response([ 
-            'message' => 'User registered successfully',
-            'status' => 'Success',
-            'data' => $response['user']],
-             201);
-    } catch (\Exception $e) {
-        \Log::error($e);
-
-        return response()->json([
-            'message' => 'An error occurred while processing the request.',
-            'status' => 'Error',
-        ], 500);
-    }
+    return $this->authRepository->signIn($request);
 }
-
 
      /**
      * Handle user sign In.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param  \Illuminate\Http\UserLoginRequest  $request
+     * @return \Illuminate\Http\Response
      */
- public function signIn(Request $request)
+ public function signIn(UserLoginRequest $request)
     {
-        
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        $credentials = $request->only('email', 'password');
-        $response = $this->authRepository->signIn($credentials['email'], $credentials['password']);
- return response([ 
-            'message' => 'Login successfully',
-            'status' => 'Success',
-            'data' => $response['user']],
-             200);
-        // return response()->json($response);
+     return $this->authRepository->signIn($request);
     }
-    
+
 public function logOut(Request $request) {
-    auth()->user()->tokens()->delete();
-    
-    return ['message' => 'logout'];
+    return $this->authRepository->logOut($request);
 }
 }

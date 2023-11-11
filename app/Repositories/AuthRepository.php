@@ -7,56 +7,86 @@ use Illuminate\Validation\ValidationException;
 use App\Exceptions\ForbiddenException;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Interfaces\AuthRepositoryInterface;
+use App\Traits\ResponseAPI;
+use App\Http\Requests\UserRegisterRequest;
+use App\Http\Requests\UserLoginRequest;
+use Illuminate\Http\Request;
 
 class AuthRepository implements AuthRepositoryInterface
 {
+    use ResponseAPI;
 
 
-public function signUp($email, $password, $name)
+public function signUp(UserRegisterRequest $request)
 {
+    
     try {
+        if (User::where('email', $request->email)->exists()) {
+        return $this->error("Email address already taken", 409);
+        }
+ 
         $user = User::create([
-            'email' => $email,
-            'name' => $name,
-            'password' => bcrypt($password),
+            'email' =>  $request->email,
+            'name' => $request->name,
+            'password' => bcrypt($request->password),
         ]);
 
-        return ['user' => $user->only('id', 'email'),
-        ];
+        return $this->success("created sucessfully", $user->only('id', 'email'), 201);
     } catch (\Exception $e) {
-        \Log::error($e);
-
-        return [
-            'status' => 'Error',
-            'message' => 'An error occurred while registering the user.',
-        ];
+        return $this->error($e->getMessage(), $e->getCode());
     }
 }
 
 
-    public function signIn($email, $password)
+    public function signIn(UserLoginRequest $request)
     {
-        $credentials = compact('email', 'password');
+    $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
+         try {
+   if (Auth::attempt($credentials)) 
+   {
             $user = Auth::user();
 
-            // if (!$user->is_verified) {
+            // if (!Auth::user()->hasVerifiedEmail()) {
             //     Auth::logout();
-            //     throw ValidationException::withMessages([
-            //          'message' => 'Your account is not verified.',
-            //     ])->status(403);
+            // return $this->error("Email address not verified", 403);
             // }
 
-            $token = $user->createToken('auth-token')->plainTextToken;
+          // Manually set the expiration time to 24 hours
+            $tokenExpiration = now()->addHours(24);
 
-            return ['token' => $token, 'user' => $user->only('id', 'email'),];
+            $token = $user->createToken('auth-token', ['expires_at' => $tokenExpiration])->plainTextToken;
+
+            $response = [
+                'access_token' => [ 
+                'token' => $token,
+                'token_type' => 'Bearer',
+                'expires_at' => 
+                 $tokenExpiration,
+                ],
+                'user' => $user->only('id', 'email'),
+            ];
+
+            return $this->success("Login sucessfully", $response, 200);
+
         }
-
-        throw ValidationException::withMessages([
-            'message' => 'The provided credentials are incorrect.',
-        ])->status(403);
+         return $this->error("Invalid email or password", 401);
+        } catch(\Exception $e) {
+            return $this->error($e->getMessage(), $e->getCode());
+        }
     }
+
+    public function logOut(Request $request)
+     {
+            try {
+             auth()->user()->tokens()->delete();
+            return $this->success("Logout sucessfully", null);
+            } catch (\Exception $e) {
+            return $this->error($e->getMessage(), $e->getCode());
+            }
+            
+        }
 }
 
 ?>
