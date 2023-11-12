@@ -10,6 +10,8 @@ use App\Http\Requests\UserRegisterRequest;
 use App\Http\Requests\UserLoginRequest;
 use Illuminate\Http\Request;
 use DB;
+use Illuminate\Support\Facades\Log;
+
 
 class AuthRepository implements AuthRepositoryInterface
 {
@@ -18,9 +20,8 @@ class AuthRepository implements AuthRepositoryInterface
 
     public function signUp(UserRegisterRequest $request)
     {
-        DB::beginTransaction();
-
         try {
+            DB::beginTransaction();
             if (User::where('email', $request->email)->exists()) {
                 return $this->error("Email address already taken", 409);
             }
@@ -28,13 +29,15 @@ class AuthRepository implements AuthRepositoryInterface
             $user = User::create([
                 'email' => $request->email,
                 'name' => $request->name,
-                'password' => bcrypt($request->password),
+                'password' => $request->password,
             ]);
             DB::commit();
+
             return $this->success("created sucessfully", $user->only('id', 'email'), 201);
+
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->error($e->getMessage(), $e->getCode());
+            return $this->error($e->getMessage(), 500);
         }
     }
 
@@ -72,7 +75,7 @@ class AuthRepository implements AuthRepositoryInterface
             }
             return $this->error("Invalid email or password", 401);
         } catch (\Exception $e) {
-            return $this->error($e->getMessage(), $e->getCode());
+            return $this->error($e->getMessage(), 500);
         }
     }
 
