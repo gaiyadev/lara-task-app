@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserLoginRequest;
 use Illuminate\Http\Request;
 use App\Interfaces\AuthRepositoryInterface;
-use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
 
 class AuthController extends Controller
@@ -18,29 +18,30 @@ class AuthController extends Controller
 
 
     /**
-     * Handle user sign up.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param  \App\Http\Requests\UserRegisterRequest  $request
      */
-
-public function signUp(UserRegisterRequest $request)
-{
-    return $this->authRepository->signUp($request);
-}
-
-     /**
-     * Handle user sign In.
-     *
-     * @param  \Illuminate\Http\UserLoginRequest  $request
-     * @return \Illuminate\Http\Response
-     */
- public function signIn(UserLoginRequest $request)
+    public function signUp(UserRegisterRequest $request)
     {
-     return $this->authRepository->signIn($request);
+        return $this->authRepository->signUp($request);
     }
 
-public function logOut(Request $request) {
-    return $this->authRepository->logOut($request);
-}
+    /**
+     * Handle user sign up.
+     *
+     * @param  \App\Http\Requests\UserLoginRequest  $request
+     */
+    public function signIn(UserLoginRequest $request)
+    {
+        return $this->authRepository->signIn($request);
+    }
+
+    /**
+     * Handle user sign up.
+     *
+     * @param \Illuminate\Http\Request  $request
+     */
+    public function logOut(Request $request)
+    {
+        return $this->authRepository->logOut($request);
+    }
 }

@@ -23,7 +23,7 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
 });
 
 Route::prefix('v1/auth')->group(function () {
-   Route::post('/signup', [AuthController::class, 'signUp']);
+Route::post('/signup', [AuthController::class, 'signUp']);
 Route::post('/signin', [AuthController::class, 'signIn']);
 Route::post('/logout', [AuthController::class, 'logOut'])->middleware('auth:sanctum');
 });

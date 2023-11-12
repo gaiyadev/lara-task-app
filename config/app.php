@@ -176,7 +176,7 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         /**
-         *  Repository service Providers..
+         *  Repository Service Providers..
          */
         App\Providers\RepositoryServiceProvider::class,
 
