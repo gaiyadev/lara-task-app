@@ -30,5 +30,7 @@ Route::prefix('v1/auth')->middleware(['json.response'])->group(function () {
     Route::post('/signin', [AuthController::class, 'signIn']) -> name('signin');
     Route::put('/verify-email', [AuthController::class, 'verifyEmail'])->name('verification.verify');
     Route::post('/resend-verification-email', [AuthController::class, 'resendVerificationEmail'])->name('verification.resend');
+    // Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
+
     Route::post('/logout', [AuthController::class, 'logOut']) -> name('logout')->middleware('auth:sanctum');
 });
