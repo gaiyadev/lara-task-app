@@ -78,6 +78,9 @@ return [
                 'log',
             ],
         ],
+        'mailtrap' => [
+            'transport' => 'smtp',
+        ],
     ],
 
     /*

@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ResendVerificationEmailRequest;
 use App\Http\Requests\UserLoginRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Interfaces\AuthRepositoryInterface;
 use App\Http\Requests\UserRegisterRequest;
+use Illuminate\Auth\Events\Verified;
 
 class AuthController extends Controller
 {
@@ -33,6 +36,23 @@ class AuthController extends Controller
     public function signIn(UserLoginRequest $request)
     {
         return $this->authRepository->signIn($request);
+    }
+
+    /**
+     * 
+     *verifyEmail
+     *
+     * @param \Illuminate\Http\Request  $request
+     */
+    public function verifyEmail(Request $request)
+    {
+        return $this->authRepository->verifyEmail($request);
+    }
+
+    public function resendVerificationEmail(ResendVerificationEmailRequest $request)
+    {
+        return $this->authRepository->resendVerificationEmail($request);
+
     }
 
     /**

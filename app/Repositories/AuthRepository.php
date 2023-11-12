@@ -10,14 +10,20 @@ use App\Http\Requests\UserRegisterRequest;
 use App\Http\Requests\UserLoginRequest;
 use Illuminate\Http\Request;
 use DB;
-use Illuminate\Support\Facades\Log;
+use App\Notifications\VerifyEmailNotification;
+use Illuminate\Support\Str;
+use App\Http\Requests\ResendVerificationEmailRequest;
 
 
 class AuthRepository implements AuthRepositoryInterface
 {
     use ResponseAPI;
 
-
+    /**
+     * Summary of signUp
+     * @param \App\Http\Requests\UserRegisterRequest $request
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
     public function signUp(UserRegisterRequest $request)
     {
         try {
@@ -30,8 +36,16 @@ class AuthRepository implements AuthRepositoryInterface
                 'email' => $request->email,
                 'name' => $request->name,
                 'password' => $request->password,
+                'verification_token' => Str::random(60),
+
             ]);
             DB::commit();
+
+            // $baseUrl = env('FRONTEND_BASE_URL', 'http://localhost');
+            // $verificationUrl = "{$baseUrl}/verify-email?id={$user->id}&token={$user->verification_token}";
+            $verificationUrl = $this->generateVerificationUrl($user);
+
+            $user->notify(new VerifyEmailNotification($verificationUrl));
 
             return $this->success("created sucessfully", $user->only('id', 'email'), 201);
 
@@ -41,7 +55,85 @@ class AuthRepository implements AuthRepositoryInterface
         }
     }
 
+    /**
+     * Summary of verifyEmail
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function verifyEmail(Request $request)
+    {
+        try {
+            $id = $request->query('id');
+            $token = $request->query('token');
 
+            $user = User::findOrFail($id);
+
+            if ($user->is_verified === 1) {
+                return $this->error('Account already verified', 403);
+            }
+
+            if ($user->verification_token === $token) {
+                $user->is_verified = true;
+                $user->verification_token = null;
+                $user->email_verified_at = now();
+                $user->save();
+
+                return $this->success("Email verification successful", $user->only('id', 'email', 'is_verified'), 201);
+            }
+
+            return $this->error('Invalid or expired token', 403);
+
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Summary of resendVerificationEmail
+     * @param \App\Http\Requests\ResendVerificationEmailRequest $request
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function resendVerificationEmail(ResendVerificationEmailRequest $request)
+    {
+        try {
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user->hasVerifiedEmail()) {
+                // Generate a new verification token
+                $user->verification_token = Str::random(60);
+                $user->save();
+
+                $verificationUrl = $this->generateVerificationUrl($user);
+
+                $user->notify(new VerifyEmailNotification($verificationUrl));
+
+                return $this->success("Verification email has been resent", $user->only('id', 'email', 'is_verified'), 200);
+
+            }
+
+            return $this->error('Email is already verified', 403);
+
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Summary of generateVerificationUrl
+     * @param mixed $user
+     * @return string
+     */
+    private function generateVerificationUrl($user)
+    {
+        $baseUrl = env('FRONTEND_BASE_URL', 'http://localhost');
+        return "{$baseUrl}/verify-email?id={$user->id}&token={$user->verification_token}";
+    }
+
+    /**
+     * Summary of signIn
+     * @param \App\Http\Requests\UserLoginRequest $request
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
     public function signIn(UserLoginRequest $request)
     {
         $credentials = $request->only('email', 'password');
@@ -79,6 +171,11 @@ class AuthRepository implements AuthRepositoryInterface
         }
     }
 
+    /**
+     * Summary of logOut
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
     public function logOut(Request $request)
     {
         try {
@@ -87,7 +184,6 @@ class AuthRepository implements AuthRepositoryInterface
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());
         }
-
     }
 }
 
