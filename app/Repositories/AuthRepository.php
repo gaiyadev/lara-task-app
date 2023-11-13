@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Events\EmailVerification;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Interfaces\AuthRepositoryInterface;
@@ -13,7 +14,7 @@ use DB;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Str;
 use App\Http\Requests\ResendVerificationEmailRequest;
-
+use Illuminate\Support\Facades\Event;
 
 class AuthRepository implements AuthRepositoryInterface
 {
@@ -41,11 +42,10 @@ class AuthRepository implements AuthRepositoryInterface
             ]);
             DB::commit();
 
-            // $baseUrl = env('FRONTEND_BASE_URL', 'http://localhost');
-            // $verificationUrl = "{$baseUrl}/verify-email?id={$user->id}&token={$user->verification_token}";
-            $verificationUrl = $this->generateVerificationUrl($user);
-
-            $user->notify(new VerifyEmailNotification($verificationUrl));
+            /**
+             * DIspatch email notification
+             */
+            Event::dispatch(new EmailVerification($user));
 
             return $this->success("created sucessfully", $user->only('id', 'email'), 201);
 
@@ -104,8 +104,9 @@ class AuthRepository implements AuthRepositoryInterface
                 $user->save();
 
                 $verificationUrl = $this->generateVerificationUrl($user);
+                Event::dispatch(new EmailVerification($user));
 
-                $user->notify(new VerifyEmailNotification($verificationUrl));
+                // $user->notify(new VerifyEmailNotification($verificationUrl));
 
                 return $this->success("Verification email has been resent", $user->only('id', 'email', 'is_verified'), 200);
 
