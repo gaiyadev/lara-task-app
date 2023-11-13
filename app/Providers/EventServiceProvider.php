@@ -3,11 +3,12 @@
 namespace App\Providers;
 
 use App\Events\EmailVerification;
+use App\Events\ForgotPassword;
 use App\Listeners\EmailVerificationListener;
+use App\Listeners\ForgotPasswordListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         EmailVerification::class => [
             EmailVerificationListener::class
+        ],
+        ForgotPassword::class => [
+            ForgotPasswordListener::class
         ],
     ];
 

@@ -2,11 +2,10 @@
 
 namespace App\Listeners;
 
-use App\Events\EmailVerification;
-use App\Notifications\VerifyEmailNotification;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Events\ForgotPassword;
+use App\Notifications\ForgotPasswordNotification;
 
-class EmailVerificationListener
+class ForgotPasswordListener
 {
     /**
      * Create the event listener.
@@ -26,23 +25,20 @@ class EmailVerificationListener
     private function generateVerificationUrl($user)
     {
         $baseUrl = env('FRONTEND_BASE_URL', 'http://localhost');
-        return "{$baseUrl}/verify-email?id={$user->id}&token={$user->verification_token}";
+        return "{$baseUrl}/forgot-password?id={$user->id}&token={$user->verification_token}";
     }
-
     /**
      * Handle the event.
      *
      * @param  object  $event
      * @return void
      */
-    public function handle(EmailVerification $event)
+    public function handle($event)
     {
         $user = $event->user;
         $baseUrl = env('FRONTEND_BASE_URL', 'http://localhost');
-        $resetPasswordUrl = "{$baseUrl}/verify-email?id={$user->id}&token={$user->verification_token}";
-        $resetPasswordUrl = $this->generateVerificationUrl($user);
-
-        $user->notify(new VerifyEmailNotification($resetPasswordUrl));
-
+        $verificationUrl = "{$baseUrl}/verify-email?id={$user->id}&token={$user->verification_token}";
+        $verificationUrl = $this->generateVerificationUrl($user);
+        $user->notify(new ForgotPasswordNotification($verificationUrl));
     }
 }

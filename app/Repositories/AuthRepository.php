@@ -11,7 +11,6 @@ use App\Http\Requests\UserRegisterRequest;
 use App\Http\Requests\UserLoginRequest;
 use Illuminate\Http\Request;
 use DB;
-use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Str;
 use App\Http\Requests\ResendVerificationEmailRequest;
 use Illuminate\Support\Facades\Event;

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -30,7 +31,11 @@ Route::prefix('v1/auth')->middleware(['json.response'])->group(function () {
     Route::post('/signin', [AuthController::class, 'signIn']) -> name('signin');
     Route::put('/verify-email', [AuthController::class, 'verifyEmail'])->name('verification.verify');
     Route::post('/resend-verification-email', [AuthController::class, 'resendVerificationEmail'])->name('verification.resend');
-    // Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
-
     Route::post('/logout', [AuthController::class, 'logOut']) -> name('logout')->middleware('auth:sanctum');
+});
+
+Route::prefix('v1/users')->middleware(['json.response'])->group(function () {
+    Route::post('/forgot-password', [UserController::class, 'forgotPassword'])->name('password.email');
+    Route::put('/reset-password', [UserController::class, 'resetPassword'])->name('password.reset');
+
 });
