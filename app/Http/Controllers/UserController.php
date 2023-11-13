@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\CreateProfileRequest;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Interfaces\UserRepositoryInterface;
-use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
 {
@@ -68,6 +69,43 @@ class UserController extends Controller
     public function changePassword(ChangePasswordRequest $request)
     {
         return $this->usersRepository->changePassword($request);
+    }
+
+    /**
+     * Summary of createProfile
+     * @param \App\Http\Requests\CreateProfileRequest $request
+     * @return void
+     */
+    public function createProfile(CreateProfileRequest $request)
+    {
+        return $this->usersRepository->createProfile($request);
+    }
+
+    /**
+     * Summary of updateProfile
+     * @param \App\Http\Requests\UpdateProfileRequest $request
+     * @return void
+     */
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+        return $this->usersRepository->updateProfile($request);
+    }
+
+    /**
+     * Summary of showProfile
+     * @return void
+     */
+    public function showProfile()
+    {
+        return $this->usersRepository->showProfile();
+    }
+    /**
+     * Summary of fetchAll
+     * @return void
+     */
+    public function fetchAll()
+    {
+        return $this->usersRepository->fetchAll();
     }
 
 }

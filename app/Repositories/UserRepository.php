@@ -4,7 +4,10 @@ namespace App\Repositories;
 
 use App\Events\ForgotPassword;
 use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\CreateProfileRequest;
 use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\UpdateProfileRequest;
+use App\Models\Profile;
 use Illuminate\Http\Request;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
@@ -154,6 +157,92 @@ class UserRepository implements UserRepositoryInterface
         }
     }
 
+    /**
+     * Summary of createProfile
+     * @param \App\Http\Requests\CreateProfileRequest $request
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function createProfile(CreateProfileRequest $request)
+    {
+        try {
+            $user = auth()->user();
+
+            if ($user->profile) {
+                return $this->error('User already has a profile', 403);
+            }
+
+            Profile::create([
+                'phone_number' => $request->phone_number,
+                'profession' => $request->profession,
+                'user_id' => $user->id,
+                'gender' => $request->gender,
+            ]);
+
+            return $this->success("Profile created successfully", $user->only('id', 'email'), 201);
+
+        } catch (\Exception $e) {
+
+            return $this->error($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Summary of updateProfile
+     * @param \App\Http\Requests\UpdateProfileRequest $request
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+
+        try {
+            $user = auth()->user();
+            $profile = $user->profile;
+
+            $profile->update([
+                'phone_number' => $request->phone_number,
+                'profession' => $request->profession,
+                'gender' => $request->gender,
+            ]);
+
+            return $this->success("Profile updated successfully", $profile, 200);
+
+        } catch (\Exception $e) {
+
+            return $this->error($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Summary of showProfile
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function showProfile()
+    {
+        try {
+            $user = auth()->user();
+            $profile = $user->profile;
+
+            if (!$profile) {
+                return $this->error("Profile not found", 404);
+            }
+            return $this->success("Profile fetched successfully", $profile, 200);
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 500);
+        }
+    }
+    /**
+     * Summary of fetchAll
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function fetchAll()
+    {
+        try {
+            $users = User::with('profile')->get();
+            return $this->success("Fetched successfully", $users, 200);
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 500);
+        }
+    }
 }
 
 ?>

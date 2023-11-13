@@ -28,16 +28,20 @@ use App\Http\Middleware\EnsureJsonResponse;
 
 Route::prefix('v1/auth')->middleware(['json.response'])->group(function () {
     Route::post('/signup', [AuthController::class, 'signUp'])->name('signup');
-    Route::post('/signin', [AuthController::class, 'signIn']) -> name('signin');
+    Route::post('/signin', [AuthController::class, 'signIn'])->name('signin');
     Route::put('/verify-email', [AuthController::class, 'verifyEmail'])->name('verification.verify');
     Route::post('/resend-verification-email', [AuthController::class, 'resendVerificationEmail'])->name('verification.resend');
     Route::post('/logout', [AuthController::class, 'logOut'])->name('logout')->middleware('auth:sanctum');
 });
 
 Route::prefix('v1/users')->middleware(['json.response'])->group(function () {
+    Route::get('/', [UserController::class, 'fetchAll'])->name('user.all');
     Route::post('/forgot-password', [UserController::class, 'forgotPassword'])->name('password.email');
     Route::put('/reset-password', [UserController::class, 'resetPassword'])->name('password.reset');
     Route::get('/{id}/user', [UserController::class, 'show'])->name('user.show');
     Route::delete('/{id}/user', [UserController::class, 'destroy'])->name('user.destroy');
     Route::put('/change-password', [UserController::class, 'changePassword'])->name('user.change_password')->middleware('auth:sanctum');
+    Route::post('/profile/create', [UserController::class, 'createProfile'])->name('profile.create')->middleware('auth:sanctum');
+    Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update')->middleware('auth:sanctum');
+    Route::get('/profile/show', [UserController::class, 'showProfile'])->name('profile.show')->middleware('auth:sanctum');
 });

@@ -28,7 +28,9 @@ class AuthRepository implements AuthRepositoryInterface
     {
         try {
             DB::beginTransaction();
+
             if (User::where('email', $request->email)->exists()) {
+
                 return $this->error("Email address already taken", 409);
             }
 
@@ -37,8 +39,8 @@ class AuthRepository implements AuthRepositoryInterface
                 'name' => $request->name,
                 'password' => $request->password,
                 'verification_token' => Str::random(60),
-
             ]);
+
             DB::commit();
         
             Event::dispatch(new EmailVerification($user));
@@ -46,7 +48,9 @@ class AuthRepository implements AuthRepositoryInterface
             return $this->success("created sucessfully", $user->only('id', 'email'), 201);
 
         } catch (\Exception $e) {
+
             DB::rollBack();
+
             return $this->error($e->getMessage(), 500);
         }
     }

@@ -3,8 +3,10 @@
 namespace App\Interfaces;
 
 use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\CreateProfileRequest;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\UpdateProfileRequest;
 
 interface UserRepositoryInterface
 {
@@ -41,7 +43,37 @@ interface UserRepositoryInterface
      * @param \App\Http\Requests\ChangePasswordRequest $request
      * @return void
      */
+    /**
+     * Summary of changePassword
+     * @param \App\Http\Requests\ChangePasswordRequest $request
+     * @return void
+     */
     public function changePassword(ChangePasswordRequest $request);
+     /**
+      * Summary of createProfile
+      * @param \App\Http\Requests\CreateProfileRequest $request
+      * @return void
+      */
+    public function createProfile(CreateProfileRequest $request);
+
+    /**
+     * Summary of showProfile
+     * @return void
+     */
+    public function showProfile();
+
+    /**
+     * Summary of updateProfile
+     * @param \App\Http\Requests\UpdateProfileRequest $request
+     * @return void
+     */
+    public function updateProfile(UpdateProfileRequest $request);
+
+    /**
+     * Summary of fetchAll
+     * @return void
+     */
+    public function fetchAll();
 
 }
 ?>
