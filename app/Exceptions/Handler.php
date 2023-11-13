@@ -2,11 +2,14 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use App\Traits\ResponseAPI;
 
 class Handler extends ExceptionHandler
 {
+    use ResponseAPI;
     /**
      * A list of the exception types that are not reported.
      *
@@ -37,5 +40,22 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    /**
+     * Summary of unauthenticated
+     * @param mixed $request
+     * @param \Illuminate\Auth\AuthenticationException $exception
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|mixed
+     */
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        if ($request->expectsJson()) {
+
+            return $this->error('Unauthenticated. Please provide a valid token.', 401);
+        }
+
+        // Default behavior for non-JSON requests
+        return redirect()->guest(route('login'));
     }
 }

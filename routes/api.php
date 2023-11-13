@@ -31,11 +31,13 @@ Route::prefix('v1/auth')->middleware(['json.response'])->group(function () {
     Route::post('/signin', [AuthController::class, 'signIn']) -> name('signin');
     Route::put('/verify-email', [AuthController::class, 'verifyEmail'])->name('verification.verify');
     Route::post('/resend-verification-email', [AuthController::class, 'resendVerificationEmail'])->name('verification.resend');
-    Route::post('/logout', [AuthController::class, 'logOut']) -> name('logout')->middleware('auth:sanctum');
+    Route::post('/logout', [AuthController::class, 'logOut'])->name('logout')->middleware('auth:sanctum');
 });
 
 Route::prefix('v1/users')->middleware(['json.response'])->group(function () {
     Route::post('/forgot-password', [UserController::class, 'forgotPassword'])->name('password.email');
     Route::put('/reset-password', [UserController::class, 'resetPassword'])->name('password.reset');
-
+    Route::get('/{id}/user', [UserController::class, 'show'])->name('user.show');
+    Route::delete('/{id}/user', [UserController::class, 'destroy'])->name('user.destroy');
+    Route::put('/change-password', [UserController::class, 'changePassword'])->name('user.change_password')->middleware('auth:sanctum');
 });

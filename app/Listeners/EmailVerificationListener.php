@@ -32,6 +32,5 @@ class EmailVerificationListener
         $verificationUrl = UrlHelper::generateVerificationUrl($user);
 
         $user->notify(new VerifyEmailNotification($verificationUrl));
-
     }
 }

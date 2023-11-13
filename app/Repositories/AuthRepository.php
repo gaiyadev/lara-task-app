@@ -40,10 +40,7 @@ class AuthRepository implements AuthRepositoryInterface
 
             ]);
             DB::commit();
-
-            /**
-             * DIspatch email notification
-             */
+        
             Event::dispatch(new EmailVerification($user));
 
             return $this->success("created sucessfully", $user->only('id', 'email'), 201);
@@ -102,7 +99,6 @@ class AuthRepository implements AuthRepositoryInterface
                 $user->verification_token = Str::random(60);
                 $user->save();
 
-                $verificationUrl = $this->generateVerificationUrl($user);
                 Event::dispatch(new EmailVerification($user));
 
                 // $user->notify(new VerifyEmailNotification($verificationUrl));
@@ -116,17 +112,6 @@ class AuthRepository implements AuthRepositoryInterface
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
         }
-    }
-
-    /**
-     * Summary of generateVerificationUrl
-     * @param mixed $user
-     * @return string
-     */
-    private function generateVerificationUrl($user)
-    {
-        $baseUrl = env('FRONTEND_BASE_URL', 'http://localhost');
-        return "{$baseUrl}/verify-email?id={$user->id}&token={$user->verification_token}";
     }
 
     /**

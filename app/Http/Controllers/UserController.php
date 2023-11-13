@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Interfaces\UserRepositoryInterface;
+use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
 {
@@ -38,4 +40,34 @@ class UserController extends Controller
     {
         return $this->usersRepository->resetPassword($request);
     }
+
+    /**
+     * Summary of show
+     * @param mixed $id
+     * @return void
+     */
+    public function show($id)
+    {
+        return $this->usersRepository->show($id);
+    }
+
+    /**
+     * Summary of destroy
+     * @param mixed $id
+     * @return void
+     */
+    public function destroy($id)
+    {
+        return $this->usersRepository->destroy($id);
+    }
+    /**
+     * Summary of changePassword
+     * @param \App\Http\Requests\ChangePasswordRequest $request
+     * @return void
+     */
+    public function changePassword(ChangePasswordRequest $request)
+    {
+        return $this->usersRepository->changePassword($request);
+    }
+
 }
