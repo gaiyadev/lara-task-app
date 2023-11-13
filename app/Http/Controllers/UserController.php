@@ -5,15 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Interfaces\UserRepositoryInterface;
-use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     protected $usersRepository;
-     /**
-      * Summary of __construct
-      * @param \App\Interfaces\UserRepositoryInterface $usersRepository
-      */
+    /**
+     * Summary of __construct
+     * @param \App\Interfaces\UserRepositoryInterface $usersRepository
+     */
 
     public function __construct(UserRepositoryInterface $usersRepository)
     {
@@ -39,6 +38,4 @@ class UserController extends Controller
     {
         return $this->usersRepository->resetPassword($request);
     }
-
-
 }

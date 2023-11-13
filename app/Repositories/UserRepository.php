@@ -67,6 +67,7 @@ class UserRepository implements UserRepositoryInterface
                 $user->password = $password;
                 $user->verification_token = null;
                 $user->save();
+                
                 return $this->success("Password reset successful", $user->only('id', 'email'), 201);
             }
 

@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\EmailVerification;
 use App\Notifications\VerifyEmailNotification;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Helpers\UrlHelper;
 
 class EmailVerificationListener
 {
@@ -18,16 +18,7 @@ class EmailVerificationListener
         //
     }
 
-    /**
-     * Summary of generateVerificationUrl
-     * @param mixed $user
-     * @return string
-     */
-    private function generateVerificationUrl($user)
-    {
-        $baseUrl = env('FRONTEND_BASE_URL', 'http://localhost');
-        return "{$baseUrl}/verify-email?id={$user->id}&token={$user->verification_token}";
-    }
+
 
     /**
      * Handle the event.
@@ -38,11 +29,9 @@ class EmailVerificationListener
     public function handle(EmailVerification $event)
     {
         $user = $event->user;
-        $baseUrl = env('FRONTEND_BASE_URL', 'http://localhost');
-        $resetPasswordUrl = "{$baseUrl}/verify-email?id={$user->id}&token={$user->verification_token}";
-        $resetPasswordUrl = $this->generateVerificationUrl($user);
+        $verificationUrl = UrlHelper::generateVerificationUrl($user);
 
-        $user->notify(new VerifyEmailNotification($resetPasswordUrl));
+        $user->notify(new VerifyEmailNotification($verificationUrl));
 
     }
 }
