@@ -1,10 +1,9 @@
 <?php
 
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Middleware\EnsureJsonResponse;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,4 +43,13 @@ Route::prefix('v1/users')->middleware(['json.response'])->group(function () {
     Route::post('/profile/create', [UserController::class, 'createProfile'])->name('profile.create')->middleware('auth:sanctum');
     Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update')->middleware('auth:sanctum');
     Route::get('/profile/show', [UserController::class, 'showProfile'])->name('profile.show')->middleware('auth:sanctum');
+});
+
+
+Route::prefix('v1/roles')->middleware(['json.response'])->group(function () {
+    Route::post('/', [RoleController::class, 'store'])->name('role.create');
+    Route::get('/', [RoleController::class, 'index'])->name('role.all');
+    Route::get('/{id}', [RoleController::class, 'show'])->name('role.show');
+    Route::patch('/{id}', [RoleController::class, 'update'])->name('role.update');
+    Route::delete('/{id}', [RoleController::class, 'destroy'])->name('role.destroy');
 });

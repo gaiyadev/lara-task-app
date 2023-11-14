@@ -39,10 +39,11 @@ class AuthRepository implements AuthRepositoryInterface
                 'name' => $request->name,
                 'password' => $request->password,
                 'verification_token' => Str::random(60),
+                'role_id' => 2,
             ]);
 
             DB::commit();
-        
+
             Event::dispatch(new EmailVerification($user));
 
             return $this->success("created sucessfully", $user->only('id', 'email'), 201);
